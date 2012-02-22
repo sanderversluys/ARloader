@@ -2,3 +2,7 @@
 bin
 gen
 obj
+
+libs/armeabi/libARLoader.so
+
+libs/armeabi/libARLoader.so
