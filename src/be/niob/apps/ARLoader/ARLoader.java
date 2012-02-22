@@ -6,6 +6,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -565,15 +568,29 @@ public class ARLoader extends Activity
     
     
     /** Native function to initialize the application. */
-    private native void initApplicationNative(int width, int height);
+    private native void initApplicationNative(int width, int height, String apkPath);
 
 
     /** Initializes AR application components. */
     private void initApplicationAR()
     {        
+    	
+    	// 
+    	String apkFilePath = null;
+		ApplicationInfo appInfo = null;
+		PackageManager packMgmr = getPackageManager();
+		
+		try {
+			appInfo = packMgmr.getApplicationInfo("com.objLoader", 0);
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Unable to locate assets, aborting...");
+		}
+		apkFilePath = appInfo.sourceDir;
+    	
         // Do application initialization in native code (e.g. registering
         // callbacks, etc.)
-        initApplicationNative(mScreenWidth, mScreenHeight);
+        initApplicationNative(mScreenWidth, mScreenHeight, apkFilePath);
 
         // Create OpenGL ES view:
         int depthSize = 16;

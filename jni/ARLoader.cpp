@@ -21,6 +21,10 @@
 #include <QCAR/Tracker.h>
 #include <QCAR/CameraCalibration.h>
 
+#include <libpng/png.h>
+#include <libzip/zip.h>
+#include <libobj/MeshUtil.h>
+
 #include "SampleUtils.h"
 #include "Texture.h"
 #include "CubeShaders.h"
@@ -55,6 +59,8 @@ QCAR::Matrix44F projectionMatrix;
 
 // Constants:
 static const float kObjectScale = 100.f;
+
+Mesh* mesh;
 
 
 JNIEXPORT int JNICALL
@@ -255,7 +261,7 @@ configureVideoBackground()
 
 JNIEXPORT void JNICALL
 Java_be_niob_apps_ARLoader_ARLoader_initApplicationNative(
-                            JNIEnv* env, jobject obj, jint width, jint height)
+                            JNIEnv* env, jobject obj, jint width, jint height, jstring appPath)
 {
     LOG("Java_be_niob_apps_ARLoader_ARLoader_initApplicationNative");
     
@@ -305,6 +311,17 @@ Java_be_niob_apps_ARLoader_ARLoader_initApplicationNative(
 
         textures[i] = Texture::create(env, textureObject);
     }
+
+    /*const char* pathStr;
+    jboolean copyFlag;
+    pathStr = env->GetStringUTFChars(appPath,&copyFlag);
+
+    zip* APKArchive = zip_open(pathStr, 0, NULL);
+
+	mesh = MeshUtil::loadMesh(APKArchive,"assets/table.obj", "assets/table.png");
+
+	zip_close(APKArchive);*/
+
 }
 
 
@@ -328,6 +345,8 @@ Java_be_niob_apps_ARLoader_ARLoader_deinitApplicationNative(
         
         textureCount = 0;
     }
+
+    delete mesh;
 }
 
 

@@ -12,6 +12,10 @@
 
 LOCAL_PATH := $(call my-dir)
 
+#include $(LOCAL_PATH)/libobj/Android.mk
+#include $(LOCAL_PATH)/libpng/Android.mk
+#include $(LOCAL_PATH)/libzip/Android.mk
+
 # The following section is used for copying the libQCAR.so prebuilt library
 # into the appropriate folder (libs/armeabi and libs/armeabi-v7a respectively)
 # and setting the include path for library-specific header files
@@ -89,6 +93,8 @@ LOCAL_SHARED_LIBRARIES := QCAR-prebuilt
 # that will be passed directly to a compiler, and you should be good.
 
 LOCAL_SRC_FILES := ARLoader.cpp SampleUtils.cpp Texture.cpp
+
+LOCAL_STATIC_LIBRARIES := libobj libzip libpng
 
 # By default, ARM target binaries will be generated in 'thumb' mode, where
 # each instruction are 16-bit wide. You can define this variable to 'arm'
