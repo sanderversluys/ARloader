@@ -24,3 +24,5 @@ APP_ABI := armeabi armeabi-v7a
 # the code difficult, stack traces may not be reliable, etc... 
 
 # APP_OPTIM := release OR debug
+
+APP_MODULS := libobj libpng

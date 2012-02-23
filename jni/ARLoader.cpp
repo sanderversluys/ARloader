@@ -28,6 +28,7 @@
 #include "SampleUtils.h"
 #include "Texture.h"
 #include "CubeShaders.h"
+#include "banana.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -58,7 +59,7 @@ bool isActivityInPortraitMode   = false;
 QCAR::Matrix44F projectionMatrix;
 
 // Constants:
-static const float kObjectScale = 100.f;
+static const float kObjectScale = 10.f;
 
 Mesh* mesh;
 
@@ -92,7 +93,7 @@ Java_be_niob_apps_ARLoader_ARLoader_onQCARInitializedNative(JNIEnv *, jobject)
 
 
 JNIEXPORT void JNICALL
-Java_be_niob_apps_ARLoader_ARLoaderRenderer_renderFrame(JNIEnv *, jobject)
+Java_be_niob_apps_ARLoader_ARLoaderRenderer_renderFrame(JNIEnv* env, jobject)
 {
     //LOG("Java_be_niob_apps_ARLoader_ARLoader_renderFrame");
 
@@ -125,9 +126,7 @@ Java_be_niob_apps_ARLoader_ARLoaderRenderer_renderFrame(JNIEnv *, jobject)
             QCAR::Tool::convertPose2GLMatrix(trackable->getPose());        
 
         // Choose the texture based on the target name:
-        //int textureIndex = (!strcmp(trackable->getName(), "stones")) ? 0 : 1;
-        
-        int textureIndex = 2; // override temp
+        int textureIndex = (!strcmp(trackable->getName(), "stones")) ? 0 : 1;
         
         const Texture* const thisTexture = textures[textureIndex];
 
@@ -142,13 +141,15 @@ Java_be_niob_apps_ARLoader_ARLoaderRenderer_renderFrame(JNIEnv *, jobject)
         glTranslatef(0.f, 0.f, kObjectScale);
         glScalef(kObjectScale, kObjectScale, kObjectScale);
 
+        //mesh->render();
+
         // Draw object:
-        glBindTexture(GL_TEXTURE_2D, thisTexture->mTextureID);
+        /*glBindTexture(GL_TEXTURE_2D, thisTexture->mTextureID);
         glTexCoordPointer(2, GL_FLOAT, 0, (const GLvoid*) &teapotTexCoords[0]);
         glVertexPointer(3, GL_FLOAT, 0, (const GLvoid*) &teapotVertices[0]);
         glNormalPointer(GL_FLOAT, 0,  (const GLvoid*) &teapotNormals[0]);
         glDrawElements(GL_TRIANGLES, NUM_TEAPOT_OBJECT_INDEX, GL_UNSIGNED_SHORT,
-                       (const GLvoid*) &teapotIndices[0]);
+                       (const GLvoid*) &teapotIndices[0]);*/
 #else
 
         QCAR::Matrix44F modelViewProjection;
@@ -162,7 +163,7 @@ Java_be_niob_apps_ARLoader_ARLoaderRenderer_renderFrame(JNIEnv *, jobject)
                                     &modelViewProjection.data[0]);
 
         glUseProgram(shaderProgramID);
-         
+
         /*glVertexAttribPointer(vertexHandle, 3, GL_FLOAT, GL_FALSE, 0,
                               (const GLvoid*) &teapotVertices[0]);
         glVertexAttribPointer(normalHandle, 3, GL_FLOAT, GL_FALSE, 0,
@@ -180,25 +181,43 @@ Java_be_niob_apps_ARLoader_ARLoaderRenderer_renderFrame(JNIEnv *, jobject)
                            (GLfloat*)&modelViewProjection.data[0] );
         glDrawElements(GL_TRIANGLES, NUM_TEAPOT_OBJECT_INDEX, GL_UNSIGNED_SHORT,
                        (const GLvoid*) &teapotIndices[0]);
+
+
+        glVertexAttribPointer(vertexHandle, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*) &bananaVerts[0]);
+
+        glVertexAttribPointer(normalHandle, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*) &bananaNormals[0]);
         
-        glVertexAttribPointer(vertexHandle, 3, GL_FLOAT, GL_FALSE, 0,	 (const GLvoid*) &bananaVerts[0]);
-        
-        glVertexAttribPointer(normalHandle, 3, GL_FLOAT, GL_FALSE, 0,
-                              (const GLvoid*) &bananaNormals[0]);
-        
-        glVertexAttribPointer(textureCoordHandle, 2, GL_FLOAT, GL_FALSE, 0,
-                              (const GLvoid*) &bananaTexCoords[0]);
+        glVertexAttribPointer(textureCoordHandle, 2, GL_FLOAT, GL_FALSE, 0, (const GLvoid*) &bananaTexCoords[0]);
         
         glEnableVertexAttribArray(vertexHandle);
         glEnableVertexAttribArray(normalHandle);
         glEnableVertexAttribArray(textureCoordHandle);
         
-        glBindTexture(GL_TEXTURE_2D, thisTexture->mTextureID);
+        glBindTexture(GL_TEXTURE_2D, mesh->texture);
         
         glUniformMatrix4fv(mvpMatrixHandle, 1, GL_FALSE,
                            (GLfloat*)&modelViewProjection.data[0] );
         
-        glDrawArrays(GL_TRIANGLES, 0, bananaNumVerts);*/
+        glDrawArrays(GL_TRIANGLES, 0, bananaNumVerts);
+         */
+
+        glVertexAttribPointer(vertexHandle, 3, GL_FLOAT, GL_FALSE, 0, mesh->vBuffer);
+
+        glVertexAttribPointer(normalHandle, 3, GL_FLOAT, GL_FALSE, 0, mesh->nBuffer);
+
+        glVertexAttribPointer(textureCoordHandle, 2, GL_FLOAT, GL_FALSE, 0, mesh->tBuffer);
+
+        glEnableVertexAttribArray(vertexHandle);
+        glEnableVertexAttribArray(normalHandle);
+        glEnableVertexAttribArray(textureCoordHandle);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, thisTexture->mTextureID);
+
+        glUniformMatrix4fv(mvpMatrixHandle, 1, GL_FALSE,
+                           (GLfloat*)&modelViewProjection.data[0] );
+
+        glDrawArrays(GL_TRIANGLES, 0, mesh->numberOfvertices);
 
         SampleUtils::checkGlError("ImageTargets renderFrame");
 #endif
@@ -312,7 +331,7 @@ Java_be_niob_apps_ARLoader_ARLoader_initApplicationNative(
         textures[i] = Texture::create(env, textureObject);
     }
 
-    /*const char* pathStr;
+    const char* pathStr;
     jboolean copyFlag;
     pathStr = env->GetStringUTFChars(appPath,&copyFlag);
 
@@ -320,7 +339,9 @@ Java_be_niob_apps_ARLoader_ARLoader_initApplicationNative(
 
 	mesh = MeshUtil::loadMesh(APKArchive,"assets/table.obj", "assets/table.png");
 
-	zip_close(APKArchive);*/
+	__android_log_print(ANDROID_LOG_VERBOSE, "ARLoader", "Number of vertices is %d", mesh->numberOfvertices);
+
+	zip_close(APKArchive);
 
 }
 

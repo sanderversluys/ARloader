@@ -42,6 +42,8 @@ Mesh::~Mesh()
 
 void Mesh::render(void) const
 {
+#ifdef USE_OPENGL_ES_1_1
+
     glBindTexture(GL_TEXTURE_2D, this->texture);
 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -57,4 +59,6 @@ void Mesh::render(void) const
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#else
+#endif
 }

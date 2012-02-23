@@ -26,14 +26,16 @@ class Mesh
 
 private:
 
+
+
+public:
+
     int numberOfvertices;
     float* vBuffer;
     float* tBuffer;
     float* nBuffer;
 
     GLuint texture;
-
-public:
 
     Mesh(GLuint _texture, int n, float* vertexBuffer, float* textureCoordBuffer, float* normalBuffer);
     virtual ~Mesh();
