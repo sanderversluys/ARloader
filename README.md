@@ -1,5 +1,5 @@
-Augmented Reality 3D model for Android
-======================================
+Augmented Reality 3D model loader for Android
+=============================================
 
 With this Android app you can load up simple Wavefront .obj files and explore them in augmented reality space.
 
